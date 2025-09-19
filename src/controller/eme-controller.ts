@@ -791,10 +791,9 @@ class EMEController extends Logger implements ComponentAPI {
     const generateRequestFilter =
       this.config.drmSystems?.[context.keySystem]?.generateRequest;
     if (generateRequestFilter) {
-      const contextWithLevelKey: MediaKeySessionContextAndLevelKey = {
+      const contextWithLevelKey = Object.assign({}, context, {
         decryptdata: levelKey,
-        ...context,
-      };
+      });
       try {
         const mappedInitData: ReturnType<typeof generateRequestFilter> =
           generateRequestFilter.call(
@@ -935,7 +934,7 @@ class EMEController extends Logger implements ComponentAPI {
         handleKeyStatus(keyStatus);
       } else {
         // Timeout key-status
-        const timeout = 0;
+        const timeout = 1000;
         context.keyStatusTimeouts ||= {};
         context.keyStatusTimeouts[keyId] ||= self.setTimeout(() => {
           if ((!context.mediaKeysSession as any) || !context.levelKeys.length) {
@@ -1153,10 +1152,9 @@ class EMEController extends Logger implements ComponentAPI {
     levelKey: LevelKey,
     keyMessage: ArrayBuffer,
   ): Promise<void> {
-    const contextWithLevelKey: MediaKeySessionContextAndLevelKey = {
+    const contextWithLevelKey = Object.assign({}, context, {
       decryptdata: levelKey,
-      ...context,
-    };
+    });
     return this.requestLicense(
       contextWithLevelKey,
       new Uint8Array(keyMessage),
